@@ -3,15 +3,14 @@ import path from 'path';
 import { Request } from 'express';
 import * as Errors from '../errors'
 import fs from 'fs/promises';
+import { FILE_PATHS } from '../utils/constants';
 
-const ROOT_DIR = process.cwd(); // backend/
-const PUBLIC_DIR = path.join(ROOT_DIR, 'src', 'public'); // backend/src/public
-const tempDir = path.join(PUBLIC_DIR, 'temp');
 
+// Метод создания директория хранения файлов /temp и /images
 export const initDirectories = async () => {
   const directories = [
-    path.join(PUBLIC_DIR, 'temp'),
-    path.join(PUBLIC_DIR, 'images'),
+    FILE_PATHS.tempDir,
+    FILE_PATHS.imagesDir,
   ]
   for (const dir of directories) {
       try {
@@ -23,6 +22,17 @@ export const initDirectories = async () => {
     }
 }
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, FILE_PATHS.tempDir) // ← используем переменную с указанием директории 'tempDir'!
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    const ext = path.extname(file.originalname); //'.jpg'
+    cb(null, `${uniqueName}${ext}`);
+  }
+})
+// Фильтрация файлов (только изображения)
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowedTypes = /jpeg|jpg|png|gif|svg/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -36,7 +46,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
 };
 
 const upload = multer({
-  dest: tempDir,  // временное хранилище
+  storage,  // временное хранилище
   limits: {
     fileSize: 5 * 1024 * 1024  // 5MB
   },

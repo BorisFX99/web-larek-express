@@ -34,3 +34,10 @@ export const validateUpdateProduct = celebrate({
     image: productBodySchema.image  // без .required()
   })
 });
+
+// DELETE /products - удаление
+export const validateDeleteProduct = celebrate({
+  [Segments.BODY]: Joi.object({
+    id: Joi.string()
+  })
+});

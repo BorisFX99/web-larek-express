@@ -1,10 +1,15 @@
-import { Error as MongooseError } from 'mongoose';
+import mongoose, { Error as MongooseError } from 'mongoose';
 import { Request, Response, NextFunction } from 'express';
-import { isCelebrateError } from 'celebrate';
+
 
 interface ErrorHandler extends Error {
   statusCode?: number;
   code?: number;
+}
+
+interface MongoErrorWithKeyPattern extends mongoose.mongo.MongoError {
+  keyPattern?: Record<string, number>;
+  keyValue?: Record<string, unknown>;
 }
 
 export const errorHandler = (
@@ -14,22 +19,19 @@ export const errorHandler = (
   next:NextFunction
 ) => {
 
-  // Ошибка валдации запроса от celebrate
-  if (isCelebrateError(error)) {
-  return res.status(400).json({
-    success: false,
-    message: 'Ошибка валидации запроса',
-    statusCode: 400
-    // без errors, без details чтобы не показать где именно что не так. скрыть.
-  });
-}
 
   // 1. Проверяем дубликат MongoDB
-  if (error.code === 11000) {
+  if (error instanceof mongoose.mongo.MongoError && error.code === 11000) {
+    const mongoError = error as MongoErrorWithKeyPattern;
+    const field = Object.keys(mongoError.keyPattern || {})[0];
+    const value = mongoError.keyValue?.[field];
     return res.status(409).json({
       success: false,
-      message: 'Такая запись уже существует',
-      statusCode: 409
+      message: `Такая запись уже существует `,
+      statusCode: 409,
+      field: {
+        dupKey:value
+      }
     });
   }
 

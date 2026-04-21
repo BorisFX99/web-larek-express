@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+import path from 'path';
+
 // env config
 export const PORT = process.env.PORT || 3000;
 export const DB_ADDRESS = process.env.DB_ADDRESS || 'mongodb://127.0.0.1:27017/weblarek';
@@ -9,3 +14,22 @@ export const AUTH_ACCESS_TOKEN_EXPIRY = process.env.AUTH_ACCESS_TOKEN_EXPIRY || 
 // безопасность прям аж ващееее :)
 export const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'access-secret-key';
 export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh-secret-key';
+
+// Обозначаю константы путей для файлов
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+export const FILE_PATHS = {
+  PUBLIC_DIR,
+  imagesDir: path.join(PUBLIC_DIR, 'images'),
+  tempDir: path.join(PUBLIC_DIR, 'temp')
+} as const;
+
+// Задаем порог в 24 часа (миллисекунды) для очистки public/temp файлов используем Crone
+export const TEMP_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
+
+
+// Константы для обработки ошибки валидации celebrate params id
+export const routerParamErrors = {
+  product: "Передан не валидный ID товара",
+} as const;
+
+export type TRouterParamErrors = typeof routerParamErrors;

@@ -30,7 +30,6 @@ export const createUser = async (req: Request, res: Response, next:NextFunction)
     res.status(201).json({
       success: true,
       accessToken,
-      refreshToken,
       user: {
         email: user.email,
         name: user.name
@@ -56,7 +55,6 @@ export const createUser = async (req: Request, res: Response, next:NextFunction)
     res.status(200).json({
       success: true,
       accessToken,
-      refreshToken,
       user: {
         email: user.email,
         name: user.name
@@ -72,7 +70,7 @@ export const createUser = async (req: Request, res: Response, next:NextFunction)
 // GET /auth/user — выпуск новой пары access- и refresh-токенов, получает httpOnly-куку c именем refreshToken
 export const getUserTokens = async (req: Request, res: Response, next:NextFunction) => {
   try {
-    // 1. Берём refreshToken из httpOnly куки (cookie-parser нужен именно здесь!)
+    // 1. Берём refreshToken из httpOnly куки
     const oldRefreshToken = req.cookies.refreshToken;
 
     if (!oldRefreshToken) {
@@ -102,7 +100,6 @@ export const getUserTokens = async (req: Request, res: Response, next:NextFuncti
     .json({
       success: true,
       accessToken,
-      refreshToken: newRefreshToken,
       user: {
         email: user.email,
         name: user.name
