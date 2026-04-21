@@ -19,9 +19,5 @@ dist
 temp
 .env
 
-# Uploaded files
-src/public/images
-src/public/temp
-
 # Environment
 .env
