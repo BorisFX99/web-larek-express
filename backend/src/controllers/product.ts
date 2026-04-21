@@ -92,9 +92,12 @@ export const updateProduct = async (req: Request, res: Response, next:NextFuncti
       const updatedProduct = await Product.findByIdAndUpdate(
         productId ,
         updateData,
-        { new: true, runValidators: true }
+        {
+          new: true,
+          runValidators: true,
+          select: '-__v -_id',
+        }
       )
-      // .select('-__v -_id');
       if (!updatedProduct) {
         return next(new Errors.NotFoundError('Товар не найден'));
       }

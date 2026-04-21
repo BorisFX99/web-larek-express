@@ -12,6 +12,9 @@ import { errorHandler } from './middlewares/error-handler';
 import { initDirectories } from './middlewares/file-upload';
 import { startTempCleanupScheduler } from './utils/cronCleanup';
 
+// Импортируем логгер Winston
+import { requestLogger, errorLogger } from './middlewares/logger';
+
 // Роуты
 import productRouter from './routes/product';
 import authRouter from './routes/auth';
@@ -30,6 +33,8 @@ app.use(cors({
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+app.use(requestLogger);
+
 // Роуты без авторизации
 app.use('/order', orderRouter);
 
@@ -41,11 +46,12 @@ app.use('/upload', uploadFileRouter);
 // Статические файлы
 app.use(express.static(FILE_PATHS.PUBLIC_DIR));
 
+// Логгер ошибок (до обработчиков ошибок)
+app.use(errorLogger);
 
 // Ошибки обработчики
-app.use(errors());  // обрабатывает ошибки валидации
-
-app.use(errorHandler);// обрабатывает остальные ошибки валидации
+app.use(errors());  // обрабатывает ошибки валидации celebrate
+app.use(errorHandler);// обрабатывает остальные ошибки (404, 500, кастомные и.т.д)
 
 const startServer = async () => {
   await initDirectories(); // директории создаем

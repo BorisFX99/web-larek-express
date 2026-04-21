@@ -16,11 +16,13 @@ export const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'access-secret
 export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh-secret-key';
 
 // Обозначаю константы путей для файлов
+const rootDir = process.cwd(); // /backend
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 export const FILE_PATHS = {
   PUBLIC_DIR,
   imagesDir: path.join(PUBLIC_DIR, 'images'),
-  tempDir: path.join(PUBLIC_DIR, 'temp')
+  tempDir: path.join(PUBLIC_DIR, 'temp'),
+  logDir: path.join(rootDir, 'src', 'logs'),
 } as const;
 
 // Задаем порог в 24 часа (миллисекунды) для очистки public/temp файлов используем Crone

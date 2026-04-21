@@ -6,11 +6,12 @@ import fs from 'fs/promises';
 import { FILE_PATHS } from '../utils/constants';
 
 
-// Метод создания директория хранения файлов /temp и /images
+// Метод создания директория хранения файлов /temp и /images и logs/
 export const initDirectories = async () => {
   const directories = [
     FILE_PATHS.tempDir,
     FILE_PATHS.imagesDir,
+    FILE_PATHS.logDir,
   ]
   for (const dir of directories) {
       try {
@@ -34,9 +35,9 @@ const storage = multer.diskStorage({
 })
 // Фильтрация файлов (только изображения)
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  const allowedTypes = /jpeg|jpg|png|gif|svg/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+const allowedTypes = /jpeg|jpg|png|gif|svg\+xml|svg/;
+const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+const mimetype = allowedTypes.test(file.mimetype);
 
   if (mimetype && extname) {
     cb(null, true);
