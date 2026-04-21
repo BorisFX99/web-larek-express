@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
-dotenv.config();
 
 import path from 'path';
+
+dotenv.config();
 
 // env config
 export const PORT = process.env.PORT || 3000;
@@ -28,10 +29,9 @@ export const FILE_PATHS = {
 // Задаем порог в 24 часа (миллисекунды) для очистки public/temp файлов используем Crone
 export const TEMP_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
-
 // Константы для обработки ошибки валидации celebrate params id
 export const routerParamErrors = {
-  product: "Передан не валидный ID товара",
+  product: 'Передан не валидный ID товара',
 } as const;
 
 export type TRouterParamErrors = typeof routerParamErrors;

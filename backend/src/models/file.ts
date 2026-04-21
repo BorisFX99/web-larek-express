@@ -6,10 +6,10 @@ export type TImage = {
 }
 
 export const imageSchema = new Schema<TImage>({
-  fileName:{
-    type: String
+  fileName: {
+    type: String,
   },
-  originalName:{
-    type: String
-  }
+  originalName: {
+    type: String,
+  },
 });

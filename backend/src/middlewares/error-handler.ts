@@ -1,7 +1,6 @@
 import mongoose, { Error as MongooseError } from 'mongoose';
 import { Request, Response, NextFunction } from 'express';
 
-
 interface ErrorHandler extends Error {
   statusCode?: number;
   code?: number;
@@ -16,10 +15,8 @@ export const errorHandler = (
   error:ErrorHandler,
   req: Request,
   res: Response,
-  next:NextFunction
+  next:NextFunction,
 ) => {
-
-
   // 1. Проверяем дубликат MongoDB
   if (error instanceof mongoose.mongo.MongoError && error.code === 11000) {
     const mongoError = error as MongoErrorWithKeyPattern;
@@ -27,11 +24,11 @@ export const errorHandler = (
     const value = mongoError.keyValue?.[field];
     return res.status(409).json({
       success: false,
-      message: `Такая запись уже существует `,
+      message: 'Такая запись уже существует ',
       statusCode: 409,
       field: {
-        dupKey:value
-      }
+        dupKey: value,
+      },
     });
   }
 
@@ -40,7 +37,7 @@ export const errorHandler = (
     return res.status(error.statusCode).json({
       success: false,
       message: error.message,
-      statusCode: error.statusCode
+      statusCode: error.statusCode,
     });
   }
 
@@ -50,7 +47,7 @@ export const errorHandler = (
       success: false,
       message: 'Ошибка валидации данных',
       statusCode: 400,
-      details: error.errors
+      details: error.errors,
     });
   }
 
@@ -59,7 +56,7 @@ export const errorHandler = (
     return res.status(400).json({
       success: false,
       message: 'Неверный формат идентификатора',
-      statusCode: 400
+      statusCode: 400,
     });
   }
 
@@ -69,6 +66,6 @@ export const errorHandler = (
   res.status(500).json({
     success: false,
     message: error.message || 'Внутренняя ошибка сервера',
-    statusCode: 500
+    statusCode: 500,
   });
 };

@@ -1,4 +1,4 @@
-import { celebrate, Joi, Segments} from 'celebrate';
+import { celebrate, Joi, Segments } from 'celebrate';
 import { CATEGORIES } from '../../models/product';
 
 // Схема для тела продукта (переиспользуемая)
@@ -9,8 +9,8 @@ const productBodySchema = {
   category: Joi.string().valid(...CATEGORIES),
   image: Joi.object().keys({
     fileName: Joi.string().required(),
-    originalName: Joi.string().required()
-  })
+    originalName: Joi.string().required(),
+  }),
 };
 
 // POST /products - создание
@@ -20,8 +20,8 @@ export const validateCreateProduct = celebrate({
     title: productBodySchema.title.required(),
     category: productBodySchema.category.required(),
     image: productBodySchema.image.required(),
-    description: productBodySchema.description
-  })
+    description: productBodySchema.description,
+  }),
 });
 
 // PATCH /products - обновление
@@ -31,13 +31,13 @@ export const validateUpdateProduct = celebrate({
     price: productBodySchema.price,
     description: productBodySchema.description,
     category: productBodySchema.category,
-    image: productBodySchema.image  // без .required()
-  })
+    image: productBodySchema.image, // без .required()
+  }),
 });
 
 // DELETE /products - удаление
 export const validateDeleteProduct = celebrate({
   [Segments.BODY]: Joi.object({
-    id: Joi.string()
-  })
+    id: Joi.string(),
+  }),
 });

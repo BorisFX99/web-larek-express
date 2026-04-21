@@ -1,8 +1,9 @@
-import { model, Schema, Model, Query } from 'mongoose';
-import { NextFunction } from 'express';
-import {imageSchema, TImage } from './file';
+import {
+  model, Schema, Model,
+} from 'mongoose';
 import path from 'path';
 import fs from 'fs/promises';
+import { imageSchema, TImage } from './file';
 import * as Errors from '../errors';
 import { FILE_PATHS } from '../utils/constants';
 
@@ -13,7 +14,7 @@ declare module 'mongoose' {
   }
 }
 
-export const CATEGORIES = ["софт-скил", "хард-скил", "другое", "дополнительное", "кнопка"] as const;
+export const CATEGORIES = ['софт-скил', 'хард-скил', 'другое', 'дополнительное', 'кнопка'] as const;
 type TCategory = typeof CATEGORIES[number];
 
 type TitleCheckQuery = {
@@ -37,23 +38,23 @@ const productSchema = new Schema<IProduct>({
     required: true,
     minlength: 2,
     maxlength: 30,
-    unique: true
+    unique: true,
   },
   image: {
-    type:imageSchema,
-    required: true
+    type: imageSchema,
+    required: true,
   },
-  price:{
+  price: {
     type: Number,
-    default: null
+    default: null,
   },
-  description:{
-    type: String
+  description: {
+    type: String,
   },
-  category:{
+  category: {
     type: String,
     enum: CATEGORIES,
-    required: true
+    required: true,
   },
 
 });
@@ -70,14 +71,14 @@ interface ProductModel extends Model<IProduct> {
 }
 
 // Хук для постобработки удаления файла после удаления продукта
-productSchema.pre('findOneAndDelete', async function(next) {
+productSchema.pre('findOneAndDelete', async function (next) {
   // Сохраняем документ в контексте
   const doc = await this.model.findOne(this.getFilter());
   this.deletedDocument = doc;
   next();
 });
 
-productSchema.post('findOneAndDelete', async function() {
+productSchema.post('findOneAndDelete', async function () {
   const doc = this.deletedDocument;
   console.log('хук послде удаления вызвался !');
   if (doc?.image?.fileName) {
@@ -86,7 +87,7 @@ productSchema.post('findOneAndDelete', async function() {
       const filePath = path.join(FILE_PATHS.imagesDir, oldFileBaseName);
       await fs.unlink(filePath);
     } catch (err) {
-        console.log(err);
+      console.log(err);
     }
   } else {
     console.log('Файл не существует или уже был удален');
@@ -94,7 +95,7 @@ productSchema.post('findOneAndDelete', async function() {
 });
 
 // Статический метод для обработки файла изображения
-productSchema.statics.processImageFile = async function(image: { fileName: string; originalName: string }) {
+productSchema.statics.processImageFile = async function (image: { fileName: string; originalName: string }) {
   const fileName = path.basename(image.fileName); // "686ade58.png"
   const tempPath = path.join(FILE_PATHS.tempDir, fileName); // "public/temp/686ade58.png"
   const finalPath = path.join(FILE_PATHS.imagesDir, fileName); // "public/images/686ade58.png"
@@ -111,27 +112,27 @@ productSchema.statics.processImageFile = async function(image: { fileName: strin
     fileName,
     imageData: {
       fileName: `/images/${fileName}`,
-      originalName: image.originalName
-    }
+      originalName: image.originalName,
+    },
   };
 };
 
 // Статический метод для удаления заменного (старого) файла после обновления
-productSchema.statics.deleteOldImage = async function( oldFileName: string ) {
-    const oldFilePath = path.join(FILE_PATHS.imagesDir, oldFileName);
-    try {
-      await fs.access(oldFilePath);// проверка есть ли че то в /images
-      await fs.unlink(oldFilePath); // удаляет из /images
-    } catch {
-      console.log('Замененный файл не существует или уже был удален');
-    }
+productSchema.statics.deleteOldImage = async function (oldFileName: string) {
+  const oldFilePath = path.join(FILE_PATHS.imagesDir, oldFileName);
+  try {
+    await fs.access(oldFilePath);// проверка есть ли че то в /images
+    await fs.unlink(oldFilePath); // удаляет из /images
+  } catch {
+    console.log('Замененный файл не существует или уже был удален');
+  }
 };
 
 // Статический метод для проверки уникальности title
-productSchema.statics.checkUniqueTitle = async function(
+productSchema.statics.checkUniqueTitle = async function (
   title: string,
-  excludeId?:string
-  ) {
+  excludeId?:string,
+) {
   const query: TitleCheckQuery = { title };
   if (excludeId) {
     query._id = { $ne: excludeId };

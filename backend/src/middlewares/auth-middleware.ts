@@ -11,26 +11,26 @@ export interface AuthRequest extends Request {
 }
 
 export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    // Берем accessToken из заголовка Authorization
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return next(new Errors.UnauthorizedError('Access token не предоставлен'));
-    }
+  // Берем accessToken из заголовка Authorization
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next(new Errors.UnauthorizedError('Access token не предоставлен'));
+  }
 
-    const accessToken = authHeader.split(' ')[1];
+  const accessToken = authHeader.split(' ')[1];
 
-    if (!accessToken) {
-      return next(new Errors.UnauthorizedError('Access token не найден'));
-    }
+  if (!accessToken) {
+    return next(new Errors.UnauthorizedError('Access token не найден'));
+  }
 
-    try {
-      // Верифицируем accessToken
+  try {
+    // Верифицируем accessToken
     const payload = jwt.verify(accessToken, JWT_ACCESS_SECRET) as { _id: string };
 
     // Добавляем user в req для дальнейшего использования
     req.user = payload;
     next();
-    } catch (err) {
+  } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {
       return next(new Errors.UnauthorizedError('Access token истек'));
     }

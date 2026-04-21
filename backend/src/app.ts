@@ -28,7 +28,7 @@ app.use(cors({
   origin: ORIGIN_ALLOW,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -50,7 +50,7 @@ app.use(express.static(FILE_PATHS.PUBLIC_DIR));
 app.use(errorLogger);
 
 // Ошибки обработчики
-app.use(errors());  // обрабатывает ошибки валидации celebrate
+app.use(errors()); // обрабатывает ошибки валидации celebrate
 app.use(errorHandler);// обрабатывает остальные ошибки (404, 500, кастомные и.т.д)
 
 const startServer = async () => {
@@ -60,9 +60,9 @@ const startServer = async () => {
     console.log(`Server listening on port ${PORT}`);
     startTempCleanupScheduler(); // очистка /temp раз в
   });
-}
+};
 
-startServer().catch(err => {
+startServer().catch((err) => {
   console.error('Ошибка запуска:', err);
   process.exit(1);
 });

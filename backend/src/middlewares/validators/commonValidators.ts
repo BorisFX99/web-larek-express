@@ -17,8 +17,8 @@ export const validateObjectId = (paramName: string = 'id', type?:keyof TRouterPa
           'string.length': message,
           'string.hex': message,
           'any.required': message,
-          'string.base': message
-        })
-    })
+          'string.base': message,
+        }),
+    }),
   });
 };
