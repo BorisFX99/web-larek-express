@@ -3,7 +3,7 @@ import * as Errors from '../errors';
 import Order, { IOrder } from '../models/order';
 import Product from '../models/product';
 
-export const createOrder = async (req: Request, res: Response, next:NextFunction) => {
+const createOrder = async (req: Request, res: Response, next:NextFunction) => {
   try {
     const orderData:IOrder = req.body;
     if (Object.keys(orderData).length === 0) {
@@ -36,11 +36,13 @@ export const createOrder = async (req: Request, res: Response, next:NextFunction
       ...orderData,
       total: Number(orderData.total),
     });
-    res.status(201).json({
+    return res.status(201).json({
       total: order.total,
       id: order._id,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
+
+export default createOrder;

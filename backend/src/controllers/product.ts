@@ -18,28 +18,30 @@ export const createProduct = async (req: Request, res: Response, next:NextFuncti
       ...productInfo,
       image: imageData,
     });
+    // Исключаем поле __v
+    const { __v, ...productOnly } = product.toObject();
     // Копируем файл и удаляем временный файл
     await fs.copyFile(tempPath, finalPath);
     await fs.unlink(tempPath);
     // 6. Отвечаем клиенту
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
-      product,
+      ...productOnly,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
-export const getProductList = async (req: Request, res: Response, next:NextFunction) => {
+export const getProductList = async (_req: Request, res: Response, next:NextFunction) => {
   try {
     const products = await Product.find({});
-    res.status(200).send({
+    return res.status(200).send({
       items: products,
       total: products.length,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -50,9 +52,9 @@ export const getProduct = async (req: Request, res: Response, next:NextFunction)
     if (!product) {
       return next(new Errors.NotFoundError('Товар по id не найден'));
     }
-    res.status(200).json(product);
+    return res.status(200).json(product);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -62,8 +64,7 @@ export const updateProduct = async (req: Request, res: Response, next:NextFuncti
     const { image, ...productInfo } = req.body;
     // Проверяем, есть ли хоть какие-то данные для обновления
     if (Object.keys(productInfo).length === 0 && !image) {
-      res.status(204).json({ message: 'Нет данных для обновления' }); // No Content
-      return;
+      return res.status(204).json({ message: 'Нет данных для обновления' }); // No Content
     }
     // Проверяем есть ли товар с перданным id
     const existingProduct:IProduct | null = await Product.findById(productId);
@@ -117,18 +118,18 @@ export const updateProduct = async (req: Request, res: Response, next:NextFuncti
       {
         new: true,
         runValidators: true,
-        select: '-__v -_id'
+        select: '-__v -_id',
       },
     );
     if (!updatedProduct) {
       return next(new Errors.NotFoundError('Товар не найден'));
     }
-    res.json({
+    return res.json({
       success: true,
       product: updatedProduct,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -139,8 +140,10 @@ export const deleteProduct = async (req: Request, res: Response, next:NextFuncti
     if (!deletedProduct) {
       return next(new Errors.NotFoundError('Товар не найден'));
     }
-    res.status(200).json(deletedProduct);
+    // Исключаем поле __v
+    const { __v, ...productOnly } = deletedProduct.toObject();
+    return res.status(200).json(productOnly);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

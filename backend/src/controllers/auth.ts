@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { AuthRequest } from 'middlewares/auth-middleware';
+import { AuthRequest } from '../middlewares/auth-middleware';
 import * as Errors from '../errors';
 import User from '../models/user';
 
@@ -25,7 +25,7 @@ export const createUser = async (req: Request, res: Response, next:NextFunction)
     // Хешируем refreshToken перед сохранением в бд
     await user.addRefreshToken(refreshToken);
     await user.save();
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       accessToken,
       user: {
@@ -34,7 +34,7 @@ export const createUser = async (req: Request, res: Response, next:NextFunction)
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -50,7 +50,7 @@ export const loginUser = async (req: Request, res: Response, next:NextFunction) 
     await user.addRefreshToken(refreshToken);
     await user.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       accessToken,
       user: {
@@ -59,11 +59,12 @@ export const loginUser = async (req: Request, res: Response, next:NextFunction) 
       },
     });
   } catch (err) {
-    next(new Errors.UnauthorizedError('Неправильные почта или пароль'));
+    return next(new Errors.UnauthorizedError('Неправильные почта или пароль'));
   }
 };
 
-// GET /auth/user — выпуск новой пары access- и refresh-токенов, получает httpOnly-куку c именем refreshToken
+// GET /auth/user — выпуск новой пары access- и refresh-токенов,
+// получает httpOnly-куку c именем refreshToken
 export const getUserTokens = async (req: Request, res: Response, next:NextFunction) => {
   try {
     // 1. Берём refreshToken из httpOnly куки
@@ -91,7 +92,7 @@ export const getUserTokens = async (req: Request, res: Response, next:NextFuncti
     // Устанавливаем новый refreshToken в httpOnly куку
     user.setRefreshCookie(res, newRefreshToken);
     //  Возвращаем новый accessToken
-    res
+    return res
       .status(200)
       .json({
         success: true,
@@ -102,7 +103,7 @@ export const getUserTokens = async (req: Request, res: Response, next:NextFuncti
         },
       });
   } catch (err) {
-    next(new Errors.UnauthorizedError('Ошибка при обновлении токенов'));
+    return next(new Errors.UnauthorizedError('Ошибка при обновлении токенов'));
   }
 };
 
@@ -122,7 +123,7 @@ export const logoutUser = async (req: Request, res: Response, next:NextFunction)
     // Очищаем cookie независимо от результата удаления из базы refresh
     User.clearRefreshCookie(res);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
     });
   } catch (err) {
@@ -148,7 +149,7 @@ export const getUser = async (req: AuthRequest, res: Response, next: NextFunctio
       return next(new Errors.UnauthorizedError('Пользователь не найден'));
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       user: {
         email: user.email,
@@ -156,6 +157,6 @@ export const getUser = async (req: AuthRequest, res: Response, next: NextFunctio
       },
     });
   } catch (err) {
-    next(new Errors.UnauthorizedError('Ошибка получения пользователя'));
+    return next(new Errors.UnauthorizedError('Ошибка получения пользователя'));
   }
 };

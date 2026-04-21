@@ -3,14 +3,14 @@ import { validateCreateProduct, validateDeleteProduct, validateUpdateProduct } f
 import {
   getProductList, createProduct, updateProduct, deleteProduct, getProduct,
 } from '../controllers/product';
-import { validateObjectId } from '../middlewares/validators/commonValidators';
+import validateObjectId from '../middlewares/validators/commonValidators';
 
 const router = Router();
 
 router.post('/', validateCreateProduct, createProduct);
 router.get('/', getProductList);
 router.get('/', getProduct);
-router.patch('/:productId', validateObjectId('productId', 'product'), validateUpdateProduct, updateProduct);
-router.delete('/:productId', validateObjectId('productId', 'product'), validateDeleteProduct, deleteProduct);
+router.patch('/:productId', validateObjectId('product', 'productId'), validateUpdateProduct, updateProduct);
+router.delete('/:productId', validateObjectId('product', 'productId'), validateDeleteProduct, deleteProduct);
 
 export default router;

@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop, no-restricted-syntax, max-len */
 import { Response } from 'express';
 import {
   model, Model, Types, Schema, Document,
@@ -23,6 +24,15 @@ export type TUser = {
   email: string;
   password: string;
   tokens: token [];
+}
+
+// Расширяем TUser методами документа типизация
+interface IUserDocument extends TUser, Document {
+  setRefreshCookie: (res: Response, refreshToken: string) => void;
+  removeRefreshToken: (refreshToken: string) => Promise<boolean>;
+  hasRefreshToken: (refreshToken: string) => Promise<boolean>;
+   addRefreshToken: (refreshToken: string, maxTokens?: number) => Promise<void>;
+  rotateRefreshToken: (oldRefreshToken: string, newRefreshToken: string) => Promise<boolean>;
 }
 
 export const userSchema = new Schema<IUserDocument>({
@@ -56,17 +66,8 @@ export const userSchema = new Schema<IUserDocument>({
   },
 });
 
-const access_expiry: StringValue = AUTH_ACCESS_TOKEN_EXPIRY as StringValue;
-const refresh_expiry: StringValue = AUTH_REFRESH_TOKEN_EXPIRY as StringValue;
-
-  // Расширяем TUser методами документа типизация
-  interface IUserDocument extends TUser, Document {
-    setRefreshCookie: (res: Response, refreshToken: string) => void;
-    removeRefreshToken: (refreshToken: string) => Promise<boolean>;
-    hasRefreshToken: (refreshToken: string) => Promise<boolean>;
-    addRefreshToken: (refreshToken: string, maxTokens?: number) => Promise<void>;
-    rotateRefreshToken: (oldRefreshToken: string, newRefreshToken: string) => Promise<boolean>;
-}
+const accessExpiry: StringValue = AUTH_ACCESS_TOKEN_EXPIRY as StringValue;
+const refreshExpiry: StringValue = AUTH_REFRESH_TOKEN_EXPIRY as StringValue;
 
   // Расширяем UserModel методами класса
   interface UserModel extends Model<IUserDocument, Document> {
@@ -81,13 +82,13 @@ userSchema.statics.generateTokens = function (userId: Types.ObjectId) {
   const accessToken = jwt.sign(
     { _id: userId },
     JWT_ACCESS_SECRET,
-    { expiresIn: access_expiry },
+    { expiresIn: accessExpiry },
   );
 
   const refreshToken = jwt.sign(
     { _id: userId },
     JWT_REFRESH_SECRET,
-    { expiresIn: refresh_expiry },
+    { expiresIn: refreshExpiry },
   );
 
   return { accessToken, refreshToken };
@@ -109,7 +110,8 @@ userSchema.statics.findUserByCredentials = function (email: string, password: st
 };
 
 // 5. Статический метод: поиск пользователя по refreshToken
-userSchema.statics.findByRefreshToken = function (refreshToken: string): Promise<IUserDocument | null> {
+userSchema.statics.findByRefreshToken = function (refreshToken: string):
+  Promise<IUserDocument | null> {
   return (async () => {
     try {
       // Верифицируем токен
@@ -141,8 +143,8 @@ userSchema.statics.clearRefreshCookie = function (res: Response) {
 
 // Метод документа для установки куки
 userSchema.methods.setRefreshCookie = function (res: Response, refreshToken: string) {
-  const maxAgeMs = ms(refresh_expiry);
-  res.cookie('refreshToken', refreshToken, {
+  const maxAgeMs = ms(refreshExpiry);
+  return res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     sameSite: 'lax',
     secure: false,

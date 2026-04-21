@@ -7,3 +7,5 @@ export class UnauthorizedError extends Error {
     this.statusCode = 401;
   }
 }
+
+export default UnauthorizedError;

@@ -10,7 +10,7 @@ export interface AuthRequest extends Request {
   };
 }
 
-export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: AuthRequest, _res: Response, next: NextFunction) => {
   // Берем accessToken из заголовка Authorization
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -29,7 +29,7 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
 
     // Добавляем user в req для дальнейшего использования
     req.user = payload;
-    next();
+    return next();
   } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {
       return next(new Errors.UnauthorizedError('Access token истек'));
@@ -37,6 +37,6 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
     if (err instanceof jwt.JsonWebTokenError) {
       return next(new Errors.UnauthorizedError('Невалидный access token'));
     }
-    next(new Errors.UnauthorizedError('Ошибка авторизации'));
+    return next(new Errors.UnauthorizedError('Ошибка авторизации'));
   }
 };

@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop, no-restricted-syntax,
+no-plusplus, @typescript-eslint/no-unused-vars */
 import cron from 'node-cron';
 import fs from 'fs/promises';
 import path from 'path';
@@ -31,9 +33,11 @@ const cleanTempFolder = async () => {
 };
 
 // Запускает планировщик очистки каждый день в 00:00.
-export const startTempCleanupScheduler = () => {
+const startTempCleanupScheduler = () => {
   // Cron-выражение "0 0 * * *" означает "каждый день в полночь" [citation:10]
   cron.schedule('0 0 * * *', () => {
     cleanTempFolder();
   });
 };
+
+export default startTempCleanupScheduler;

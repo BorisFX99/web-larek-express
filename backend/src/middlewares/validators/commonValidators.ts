@@ -2,7 +2,7 @@ import { celebrate, Joi, Segments } from 'celebrate';
 import { routerParamErrors, TRouterParamErrors } from '../../utils/constants';
 
 // Проверяем динамический ключ id запроса на соответвие типу _id из базы
-export const validateObjectId = (paramName: string = 'id', type?:keyof TRouterParamErrors) => {
+const validateObjectId = (type?:keyof TRouterParamErrors, paramName: string = 'id') => {
   const message = type
     ? routerParamErrors[type]
     : 'Передан не валидный ID';
@@ -22,3 +22,5 @@ export const validateObjectId = (paramName: string = 'id', type?:keyof TRouterPa
     }),
   });
 };
+
+export default validateObjectId;

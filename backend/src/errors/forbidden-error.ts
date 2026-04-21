@@ -7,3 +7,5 @@ export class ForbiddenError extends Error {
     this.statusCode = 403;
   }
 }
+
+export default ForbiddenError;

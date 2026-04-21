@@ -7,22 +7,8 @@ import { imageSchema, TImage } from './file';
 import * as Errors from '../errors';
 import { FILE_PATHS } from '../utils/constants';
 
-// Добавьте это перед объявлением схемы
-declare module 'mongoose' {
-  interface Query<ResultType, DocType, THelpers = {}> {
-    deletedDocument?: IProduct;
-  }
-}
-
 export const CATEGORIES = ['софт-скил', 'хард-скил', 'другое', 'дополнительное', 'кнопка'] as const;
 type TCategory = typeof CATEGORIES[number];
-
-type TitleCheckQuery = {
-  title: string;
-  _id?: {
-    $ne: string;
-  };
-};
 
 export interface IProduct {
     title: string;
@@ -30,7 +16,22 @@ export interface IProduct {
     description: string;
     category: TCategory;
     image:TImage;
+    __v?:number;
 }
+
+declare module 'mongoose' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface Query<ResultType, DocType, THelpers = {}> {
+    deletedDocument?: IProduct;
+  }
+}
+
+type TitleCheckQuery = {
+  title: string;
+  _id?: {
+    $ne: string;
+  };
+};
 
 const productSchema = new Schema<IProduct>({
   title: {
@@ -95,7 +96,10 @@ productSchema.post('findOneAndDelete', async function () {
 });
 
 // Статический метод для обработки файла изображения
-productSchema.statics.processImageFile = async function (image: { fileName: string; originalName: string }) {
+productSchema.statics.processImageFile = async function (image: {
+  fileName: string;
+  originalName: string
+}) {
   const fileName = path.basename(image.fileName); // "686ade58.png"
   const tempPath = path.join(FILE_PATHS.tempDir, fileName); // "public/temp/686ade58.png"
   const finalPath = path.join(FILE_PATHS.imagesDir, fileName); // "public/images/686ade58.png"

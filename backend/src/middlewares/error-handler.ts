@@ -11,11 +11,11 @@ interface MongoErrorWithKeyPattern extends mongoose.mongo.MongoError {
   keyValue?: Record<string, unknown>;
 }
 
-export const errorHandler = (
+const errorHandler = (
   error:ErrorHandler,
-  req: Request,
+  _req: Request,
   res: Response,
-  next:NextFunction,
+  _next:NextFunction,
 ) => {
   // 1. Проверяем дубликат MongoDB
   if (error instanceof mongoose.mongo.MongoError && error.code === 11000) {
@@ -63,9 +63,11 @@ export const errorHandler = (
   // 5. ВСЁ ОСТАЛЬНОЕ - 500 (системная ошибка)
   console.error('Unhandled error:', error); // Логируем для отладки
 
-  res.status(500).json({
+  return res.status(500).json({
     success: false,
     message: error.message || 'Внутренняя ошибка сервера',
     statusCode: 500,
   });
 };
+
+export default errorHandler;

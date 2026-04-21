@@ -1,4 +1,5 @@
-import multer from 'multer';
+/* eslint-disable no-undef */
+import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 import { Request } from 'express';
 import fs from 'fs/promises';
@@ -12,28 +13,31 @@ export const initDirectories = async () => {
     FILE_PATHS.imagesDir,
     FILE_PATHS.logDir,
   ];
-  for (const dir of directories) {
-    try {
-      await fs.mkdir(dir, { recursive: true });
-    } catch (error) {
-      console.error(`Ошибка при создании ${dir}:`, error);
-      throw error;
-    }
+
+  try {
+    await Promise.all(directories.map((dir) => fs.mkdir(dir, { recursive: true })));
+  } catch (error) {
+    console.error('Ошибка при создании директорий:', error);
+    throw error;
   }
 };
 
 const storage = multer.diskStorage({
-  destination(req, file, cb) {
+  destination(_req, _file, cb) {
     cb(null, FILE_PATHS.tempDir); // ← используем переменную с указанием директории 'tempDir'!
   },
-  filename(req, file, cb) {
+  filename(_req, file, cb) {
     const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
     const ext = path.extname(file.originalname); // '.jpg'
     cb(null, `${uniqueName}${ext}`);
   },
 });
 // Фильтрация файлов (только изображения)
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+) => {
   const allowedTypes = /jpeg|jpg|png|gif|svg\+xml|svg/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = allowedTypes.test(file.mimetype);

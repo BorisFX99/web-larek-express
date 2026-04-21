@@ -2,7 +2,7 @@ import { celebrate, Joi, Segments } from 'celebrate';
 import { PaymentType } from '../../models/order';
 
 // Валидация заказа
-export const validateCreateOrder = celebrate({
+const validateCreateOrder = celebrate({
   [Segments.BODY]: Joi.object({
     payment: Joi.string()
       .valid(...Object.values(PaymentType)) // ['card', 'online']
@@ -58,3 +58,5 @@ export const validateCreateOrder = celebrate({
       }),
   }),
 });
+
+export default validateCreateOrder;

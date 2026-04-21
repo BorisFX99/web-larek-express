@@ -4,13 +4,14 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import { errors } from 'celebrate';
 // Константы
-import { FILE_PATHS } from './utils/constants';
-import { ORIGIN_ALLOW, PORT, DB_ADDRESS } from './utils/constants';
+import {
+  FILE_PATHS, ORIGIN_ALLOW, PORT, DB_ADDRESS,
+} from './utils/constants';
 
 // Мидлвары, кастомные методы
-import { errorHandler } from './middlewares/error-handler';
+import errorHandler from './middlewares/error-handler';
+import startTempCleanupScheduler from './utils/cronCleanup';
 import { initDirectories } from './middlewares/file-upload';
-import { startTempCleanupScheduler } from './utils/cronCleanup';
 
 // Импортируем логгер Winston
 import { requestLogger, errorLogger } from './middlewares/logger';

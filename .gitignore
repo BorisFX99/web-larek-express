@@ -1,0 +1,15 @@
+
+# Dependency directory
+node_modules
+
+# Optional REPL history
+.DS_Store
+.idea
+.vscode
+
+# Typescript build
+dist
+temp
+
+# Environment
+.env
