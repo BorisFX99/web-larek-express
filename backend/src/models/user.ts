@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop, no-restricted-syntax, max-len */
 import { Response } from 'express';
 import {
   model, Model, Types, Schema, Document,
@@ -193,7 +192,10 @@ userSchema.methods.addRefreshToken = function (refreshToken: string): Promise<vo
 };
 
 // Метод документа: ротация токена (удалить старый, добавить новый)
-userSchema.methods.rotateRefreshToken = function (oldRefreshToken: string, newRefreshToken: string): Promise<boolean> {
+userSchema.methods.rotateRefreshToken = function (
+  oldRefreshToken: string,
+  newRefreshToken: string,
+): Promise<boolean> {
   return (async () => {
     const removed = await this.removeRefreshToken(oldRefreshToken);
     if (removed) {

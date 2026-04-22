@@ -1,4 +1,3 @@
-// middlewares/auth.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JWT_ACCESS_SECRET } from '../utils/constants';

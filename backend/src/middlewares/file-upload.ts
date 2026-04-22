@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 import { Request } from 'express';
@@ -24,7 +23,7 @@ export const initDirectories = async () => {
 
 const storage = multer.diskStorage({
   destination(_req, _file, cb) {
-    cb(null, FILE_PATHS.tempDir); // ← используем переменную с указанием директории 'tempDir'!
+    cb(null, FILE_PATHS.tempDir);
   },
   filename(_req, file, cb) {
     const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
@@ -35,6 +34,7 @@ const storage = multer.diskStorage({
 // Фильтрация файлов (только изображения)
 const fileFilter = (
   _req: Request,
+  // eslint-disable-next-line no-undef -- не импортриутся тип File из multer. А так все работает
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ) => {

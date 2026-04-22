@@ -24,10 +24,7 @@ export const createProduct = async (req: Request, res: Response, next:NextFuncti
     await fs.copyFile(tempPath, finalPath);
     await fs.unlink(tempPath);
     // 6. Отвечаем клиенту
-    return res.status(201).json({
-      success: true,
-      ...productOnly,
-    });
+    return res.status(201).json(productOnly);
   } catch (error) {
     return next(error);
   }
@@ -94,6 +91,7 @@ export const updateProduct = async (req: Request, res: Response, next:NextFuncti
           new: true,
           runValidators: true,
           select: '-__v -_id',
+          lean: true,
         },
       );
       if (!updatedProduct) {
@@ -107,9 +105,7 @@ export const updateProduct = async (req: Request, res: Response, next:NextFuncti
         await Product.deleteOldImage(oldFileBaseName);
       }
       // Ответ клиенту
-      return res.status(200).json({
-        product: updatedProduct,
-      });
+      return res.status(200).json(updatedProduct);
     }
     // Если файл не обновляется, просто обновляем данные в БД
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -119,15 +115,13 @@ export const updateProduct = async (req: Request, res: Response, next:NextFuncti
         new: true,
         runValidators: true,
         select: '-__v -_id',
+        lean: true,
       },
     );
     if (!updatedProduct) {
       return next(new Errors.NotFoundError('Товар не найден'));
     }
-    return res.json({
-      success: true,
-      product: updatedProduct,
-    });
+    return res.json(updatedProduct);
   } catch (error) {
     return next(error);
   }

@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop, no-restricted-syntax,
-no-plusplus, @typescript-eslint/no-unused-vars */
 import cron from 'node-cron';
 import fs from 'fs/promises';
 import path from 'path';
@@ -11,7 +9,6 @@ const cleanTempFolder = async () => {
   try {
     const items = await fs.readdir(FILE_PATHS.tempDir);
     const now = Date.now();
-    let deletedCount = 0;
 
     for (const file of items) {
       const filePath = path.join(FILE_PATHS.tempDir, file);
@@ -21,7 +18,6 @@ const cleanTempFolder = async () => {
 
         if (fileAge > TEMP_EXPIRATION_TIME) {
           await fs.unlink(filePath);
-          deletedCount++;
         }
       } catch (err) {
         console.error(` Ошибка при обработке файла ${file}:`, err);
