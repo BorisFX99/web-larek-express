@@ -21,6 +21,7 @@ import productRouter from './routes/product';
 import authRouter from './routes/auth';
 import uploadFileRouter from './routes/upload-file';
 import orderRouter from './routes/order';
+import notFoundRouter from './routes/not-found';
 
 const app = express();
 
@@ -46,6 +47,9 @@ app.use('/upload', uploadFileRouter);
 
 // Статические файлы
 app.use(express.static(FILE_PATHS.PUBLIC_DIR));
+
+// not-found
+app.use('*', notFoundRouter);
 
 // Логгер ошибок (до обработчиков ошибок)
 app.use(errorLogger);

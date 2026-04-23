@@ -9,7 +9,7 @@ const router = Router();
 
 router.post('/', validateCreateProduct, createProduct);
 router.get('/', getProductList);
-router.get('/', getProduct);
+router.get('/:productId', validateObjectId('product', 'productId'), getProduct);
 router.patch('/:productId', validateObjectId('product', 'productId'), validateUpdateProduct, updateProduct);
 router.delete('/:productId', validateObjectId('product', 'productId'), validateDeleteProduct, deleteProduct);
 

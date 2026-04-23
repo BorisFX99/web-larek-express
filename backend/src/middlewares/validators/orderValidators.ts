@@ -1,14 +1,14 @@
 import { celebrate, Joi, Segments } from 'celebrate';
-import { PaymentType } from '../../models/order';
+import { payment } from '../../models/order';
 
 // Валидация заказа
 const validateCreateOrder = celebrate({
   [Segments.BODY]: Joi.object({
     payment: Joi.string()
-      .valid(...Object.values(PaymentType)) // ['card', 'online']
+      .valid(...Object.values(payment)) // ['card', 'online']
       .required()
       .messages({
-        'any.only': `Допустимый формат способа оплаты: ${Object.values(PaymentType).join(', ')}`,
+        'any.only': `Допустимый формат способа оплаты: ${Object.values(payment).join(', ')}`,
         'any.required': '"Способ оплаты" обязательное поле',
       }),
     email: Joi.string()

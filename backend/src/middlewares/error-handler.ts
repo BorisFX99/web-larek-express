@@ -1,73 +1,31 @@
-import mongoose, { Error as MongooseError } from 'mongoose';
 import { Request, Response, NextFunction } from 'express';
+import parseError from '../utils/error-parser';
 
-interface ErrorHandler extends Error {
-  statusCode?: number;
-  code?: number;
-}
-
-interface MongoErrorWithKeyPattern extends mongoose.mongo.MongoError {
-  keyPattern?: Record<string, number>;
-  keyValue?: Record<string, unknown>;
-}
+// Формируем ответ с success: false
+type TErrorResponse = {
+    success: boolean;
+    message: string;
+    statusCode: number;
+    details?: unknown; // добавляем optional
+  }
 
 const errorHandler = (
-  error:ErrorHandler,
+  error: unknown,
   _req: Request,
   res: Response,
-  _next:NextFunction,
+  _next: NextFunction,
 ) => {
-  // 1. Проверяем дубликат MongoDB
-  if (error instanceof mongoose.mongo.MongoError && error.code === 11000) {
-    const mongoError = error as MongoErrorWithKeyPattern;
-    const field = Object.keys(mongoError.keyPattern || {})[0];
-    const value = mongoError.keyValue?.[field];
-    return res.status(409).json({
-      success: false,
-      message: 'Такая запись уже существует ',
-      statusCode: 409,
-      field: {
-        dupKey: value,
-      },
-    });
-  }
-
-  // 2. Проверяем наши кастомные ошибки (у них есть statusCode)
-  if (error.statusCode && error instanceof Error) {
-    return res.status(error.statusCode).json({
-      success: false,
-      message: error.message,
-      statusCode: error.statusCode,
-    });
-  }
-
-  // 3. Проверяем ошибки валидации Mongoose
-  if (error instanceof MongooseError.ValidationError) {
-    return res.status(400).json({
-      success: false,
-      message: 'Ошибка валидации данных',
-      statusCode: 400,
-      details: error.errors,
-    });
-  }
-
-  // 4. Проверяем ошибку каста (неверный ID)
-  if (error instanceof MongooseError.CastError) {
-    return res.status(400).json({
-      success: false,
-      message: 'Неверный формат идентификатора',
-      statusCode: 400,
-    });
-  }
-
-  // 5. ВСЁ ОСТАЛЬНОЕ - 500 (системная ошибка)
-  console.error('Unhandled error:', error); // Логируем для отладки
-
-  return res.status(500).json({
+  const appError = parseError(error);
+  // Формируем ответ с success: false
+  const errorResponse:TErrorResponse = {
     success: false,
-    message: error.message || 'Внутренняя ошибка сервера',
-    statusCode: 500,
-  });
+    message: appError.message,
+    statusCode: appError.statusCode,
+  };
+  // Добавляем details, если есть
+  if (appError.details) {
+    errorResponse.details = appError.details;
+  }
+  return res.status(appError.statusCode).json(errorResponse);
 };
-
 export default errorHandler;

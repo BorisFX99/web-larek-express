@@ -3,17 +3,20 @@ import {
 } from 'mongoose';
 import validator from 'validator';
 
-export enum PaymentType {
-  Card = 'card',
-  Online = 'online'
-}
+export const payment = {
+  card: 'card',
+  online: 'online',
+} as const;
+
+export type TPaymentType = typeof payment [keyof typeof payment];
+
 export interface IOrder {
-    payment: PaymentType;
-    email: string;
-    phone: string;
-    address: string;
-    total: number;
-    items: string[];
+  payment: TPaymentType;
+  email: string;
+  phone: string;
+  address: string;
+  total: number;
+  items: string[];
 }
 
 const orderSchema = new Schema<IOrder>({
@@ -39,7 +42,7 @@ const orderSchema = new Schema<IOrder>({
   },
   payment: {
     type: String,
-    enum: Object.values(PaymentType),
+    enum: Object.values(payment),
     required: true,
   },
   email: {
