@@ -22,17 +22,17 @@ export default function AdminNewProduct() {
 	const [selectedFile, setSelectedFile] = useState<IFile | null>(null);
 	const [selectedCategory, setSelectedCategory] = useState<OptionType | null>(null);
 	const isValidForm = isValid && Boolean(selectedFile) && Boolean(selectedCategory);
-	
+
 	const navigateAdminList = () => navigate(AppRoute.Admin);
 
 	const handleFileChange = (e: SyntheticEvent<HTMLInputElement>) => {
-		if (e.currentTarget.files?.length) {		
+		if (e.currentTarget.files?.length) {
 			const dataFile = new FormData();
 			dataFile.append('file', e.currentTarget.files[0]);
 
 			uploadImageFile(dataFile).unwrap().then((data)  => {
 				setSelectedFile(data);
-			});			
+			});
 		}
 	};
 

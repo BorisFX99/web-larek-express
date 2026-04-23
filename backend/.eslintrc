@@ -44,6 +44,23 @@
         "varsIgnorePattern": "^_",
         "caughtErrorsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ForInStatement",
+        "message": "for..in запрещен. Используйте Object.keys/values/entries"
+      },
+      {
+        "selector": "LabeledStatement",
+        "message": "Метки запрещены. Используйте функции или флаги"
+      },
+      {
+        "selector": "WithStatement",
+        "message": "with запрещен в strict mode"
+      }
+      // ForOfStatement разрешен - убираем из запрещенных для async await циклов
+    ],
+    "no-await-in-loop": "off"
   }
 }
